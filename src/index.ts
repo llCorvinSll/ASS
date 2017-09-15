@@ -1,4 +1,6 @@
-'use strict';
+import {parseASS} from "./parser/ass";
+import {ASS_CSS, CAF, channel, RAF, RAFID} from "./global";
+import {createAnimation} from "./renderer/animation";
 
 function ASS() {
   this.tree = {};

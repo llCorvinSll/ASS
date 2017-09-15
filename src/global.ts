@@ -6,7 +6,7 @@ export const CAF = window.cancelAnimationFrame ||
                    (window as any).mozCancelAnimationFrame ||
                    window.webkitCancelAnimationFrame ||
                    function (id:number) {clearTimeout(id); };
-export const RAFID = 0;
-export const channel = [];
+export let RAFID = 0;
+export let channel = [];
 export const xmlns = "http://www.w3.org/2000/svg";
 export const ASS_CSS = "__ASS_MIN_CSS__";
