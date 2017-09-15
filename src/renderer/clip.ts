@@ -1,4 +1,5 @@
 import {generateUUID} from "../uuid";
+import {xmlns} from "../global";
 
 const $clipPath = document.createElementNS(xmlns, "svg");
 $clipPath.setAttributeNS(null, "class", "ASS-clip-path");
@@ -15,7 +16,7 @@ export function createClipPath(dia) {
     const pry = this.tree.ScriptInfo.PlayResY;
 
     if (dia.clip.dots !== null) {
-      const n = dia.clip.dots.map(function (d, i) {
+      const n = dia.clip.dots.map((d, i) => {
         if (i & 1) {
             return d / pry;
         } else {
