@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "lib": [ "es2015.promise", "es5", "dom", "scripthost", "es2015.iterable" ],
+    "sourceMap": true,
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "noImplicitAny": true,
+    "outDir": "test-build",
+    "noUnusedLocals": true,
+    "strictNullChecks": false,
+    "importHelpers": true,
+    "noEmitHelpers": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "typeRoots": [
+      "node_modules/@types",
+      "es6_module_adapters/@types",
+      "services/_definitions"
+    ],
+    "types": [
+      "jasmine",
+      "jquery",
+      "jquery-mockjax",
+      "react",
+      "react-dom",
+      "lodash",
+      "underscore",
+      "urijs"
+    ]
+  },
+  "exclude": [
+    "node_modules",
+    "tools",
+    "i18n",
+    "tests_selenium",
+    "vision/samsung_builder",
+    "vast_parser"
+  ],
+  "baseUrl": ".",
+  "paths": {
+    "md5": ["es6_module_adapters/md5/index"],
+    "webos": ["es6_module_adapters/webos/index"],
+    "cordova_webos": ["es6_module_adapters/cordova_webos/index"],
+    "route-parser": ["es6_module_adapters/route-parser/index"],
+    "log4ts": ["es6_module_adapters/log4ts/index"]
+  }
+}
