@@ -4,7 +4,7 @@ import {parseStyle} from "./style";
 import {BlockType, ISubtitleTree} from "./ISubtitleTree";
 
 
-export function parseASS(data:string) {
+export function parseASS(data:string):ISubtitleTree {
     data = data.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const tree:ISubtitleTree = {
     ScriptInfo: {

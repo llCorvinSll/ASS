@@ -10,6 +10,9 @@ interface IScriptInfo {
     Title:string;
     WrapStyle:number;
     Timer:number;
+    PlayResY?:number;
+    PlayResX?:number;
+    ScaledBorderAndShadow?:string;
     ["Original Script"]:string;
 
     [key:string]:number | string;
@@ -59,6 +62,11 @@ export interface IStyle {
     _tags:IStyleTags;
 
     [key:string]:string | number | IStyleTags;
+}
+
+export interface IPosition {
+    x:number;
+    y:number;
 }
 
 export interface IStyleTags {

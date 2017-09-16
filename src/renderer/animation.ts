@@ -2,6 +2,9 @@ import {generateUUID} from "../uuid";
 import {getRealFontSize} from "./font-size";
 import {createTransform} from "./transform";
 import {toRGBA} from "./rgba";
+import {createCSSBS} from "./border-and-shadow";
+import {IEffect, ISubtitleTree} from "../parser/ISubtitleTree";
+import {ITags} from "../parser/tags";
 
 const $animation = document.createElement("style");
 $animation.type = "text/css";
@@ -22,9 +25,9 @@ class KeyFrames {
         for (const percentage in this.obj) {
             arr.push(percentage + "{");
             for (const property in this.obj[percentage]) {
-                const rule = property + ":" + this.obj[percentage][property] + ";";
+                const rule = `${property}:${this.obj[percentage][property]};`;
                 if (property === "transform") {
-                    arr.push("-webkit-" + rule);
+                    arr.push(`-webkit-${rule}`);
                 }
                 arr.push(rule);
             }
@@ -46,11 +49,16 @@ function getName(str:string, kfObj:any) {
     return null;
 }
 
-export function createAnimation() {
-    const kfObj = {};
+interface IAnimationOptions {
+    scale:number;
+    resolution:{x:number, y:number};
+}
 
-    for (let i = this.tree.Events.Dialogue.length - 1; i >= 0; i--) {
-        const dia = this.tree.Events.Dialogue[i];
+export function createAnimation(this:void, tree:ISubtitleTree, options:IAnimationOptions) {
+    const kfObj:{[key:string]:string} = {};
+
+    for (let i = tree.Events.Dialogue.length - 1; i >= 0; i--) {
+        const dia = tree.Events.Dialogue[i];
         const pt = dia._parsedText;
         const dur = (dia.End - dia.Start) * 1000;
         let kf = new KeyFrames();
@@ -58,20 +66,20 @@ export function createAnimation() {
         const t = [];
 
         if (dia.Effect && !pt.move) {
-            const eff = dia.Effect;
+            const eff = dia.Effect as IEffect;
 
             if (eff.name === "banner") {
-                const tx = this.scale * (dur / eff.delay) * (eff.lefttoright ? 1 : -1);
+                const tx = options.scale * (dur / eff.delay) * (eff.lefttoright ? 1 : -1);
                 kf.set("0.000%", "transform", "translateX(0)");
-                kf.set("100.000%", "transform", "translateX(" + tx + "px)");
+                kf.set("100.000%", "transform", `translateX(${tx}px)`);
             }
 
             if (/^scroll/.test(eff.name)) {
                 const updown = /up/.test(eff.name) ? -1 : 1;
                 const y1 = eff.y1;
-                const y2 = eff.y2 || this.resolution.y;
-                const tFrom = "translateY(" + this.scale * y1 * updown + "px)";
-                const tTo = "translateY(" + this.scale * y2 * updown + "px)";
+                const y2 = eff.y2 || options.resolution.y;
+                const tFrom = `translateY(${options.scale * y1 * updown}px)`;
+                const tTo = `translateY(${options.scale * y2 * updown}px)`;
                 const dp = (y2 - y1) / (dur / eff.delay) * 100;
 
                 t[1] = Math.min(100, dp).toFixed(3) + "%";
@@ -87,8 +95,8 @@ export function createAnimation() {
 
         if (pt.fad && pt.fad.length === 2) {
             t[0] = "0.000%";
-            t[1] = Math.min(100, pt.fad[0] / dur * 100).toFixed(3) + "%";
-            t[2] = Math.max(0, (dur - pt.fad[1]) / dur * 100).toFixed(3) + "%";
+            t[1] = `${Math.min(100, pt.fad[0] / dur * 100).toFixed(3)}%`;
+            t[2] = `${Math.max(0, (dur - pt.fad[1]) / dur * 100).toFixed(3)}%`;
             t[3] = "100.000%";
             kf.set(t[0], "opacity", 0);
             kf.set(t[1], "opacity", 1);
@@ -115,14 +123,14 @@ export function createAnimation() {
 
             if (pt.move.length === 6) {
                 t[0] = "0.000%";
-                t[1] = Math.min(100, pt.move[4] / dur * 100).toFixed(3) + "%";
-                t[2] = Math.min(100, pt.move[5] / dur * 100).toFixed(3) + "%";
+                t[1] = `${Math.min(100, pt.move[4] / dur * 100).toFixed(3)}%`;
+                t[2] = `${Math.min(100, pt.move[5] / dur * 100).toFixed(3)}%`;
                 t[3] = "100.000%";
 
                 for (let j = 0; j <= 3; j++) {
-                    const tx = this.scale * (pt.move[j < 2 ? 0 : 2] - pt.pos.x);
-                    const ty = this.scale * (pt.move[j < 2 ? 1 : 3] - pt.pos.y);
-                    kf.set(t[j], "transform", "translate(" + tx + "px, " + ty + "px)");
+                    const tx = options.scale * (pt.move[j < 2 ? 0 : 2] - pt.pos.x);
+                    const ty = options.scale * (pt.move[j < 2 ? 1 : 3] - pt.pos.y);
+                    kf.set(t[j], "transform", `translate(${tx}px, ${ty}px)`);
                 }
             }
         }
@@ -145,12 +153,12 @@ export function createAnimation() {
                 for (let k = tags.t.length - 1; k >= 0; k--) {
                     const ttags = JSON.parse(JSON.stringify(tags.t[k].tags));
                     t[0] = "0.000%";
-                    t[1] = Math.min(100, tags.t[k].t1 / dur * 100).toFixed(3) + "%";
-                    t[2] = Math.min(100, tags.t[k].t2 / dur * 100).toFixed(3) + "%";
+                    t[1] = `${Math.min(100, tags.t[k].t1 / dur * 100).toFixed(3)}%`;
+                    t[2] = `${Math.min(100, tags.t[k].t2 / dur * 100).toFixed(3)}%`;
                     t[3] = "100.000%";
                     if (ttags.fs) {
-                        const fsFrom = this.scale * getRealFontSize(tags.fs, tags.fn) + "px";
-                        const fsTo = this.scale * getRealFontSize(ttags.fs, tags.fn) + "px";
+                        const fsFrom = `${options.scale * getRealFontSize(tags.fs, tags.fn)}px`;
+                        const fsTo = `${options.scale * getRealFontSize(ttags.fs, tags.fn)}px`;
 
                         kf.set(t[0], "font-size", fsFrom);
                         kf.set(t[1], "font-size", fsFrom);
@@ -159,8 +167,8 @@ export function createAnimation() {
                     }
 
                     if (ttags.fsp) {
-                        const fspFrom = this.scale * tags.fsp + "px";
-                        const fspTo = this.scale * ttags.fsp + "px";
+                        const fspFrom = `${options.scale * tags.fsp}px`;
+                        const fspTo = `${options.scale * ttags.fsp}px`;
 
                         kf.set(t[0], "letter-spacing", fspFrom);
                         kf.set(t[1], "letter-spacing", fspFrom);
@@ -196,9 +204,9 @@ export function createAnimation() {
 
                     const bsTags = ["c3", "a3", "c4", "a4",
                   "xbord", "ybord", "xshad", "yshad", "blur"];
-                    const hasTextShadow = function (t) {
-                        for (let i = bsTags.length - 1; i >= 0; --i) {
-                            if (t[bsTags[i]] !== undefined) {
+                    const hasTextShadow = function (current_tags:ITags) {
+                        for (let kk = bsTags.length - 1; kk >= 0; --kk) {
+                            if (current_tags[bsTags[kk]] !== undefined) {
                                 return true;
                             }
                         }
@@ -213,8 +221,8 @@ export function createAnimation() {
                             }
                         });
 
-                        const sisbas = this.tree.ScriptInfo.ScaledBorderAndShadow;
-                        const sbas = /Yes/i.test(sisbas) ? this.scale : 1;
+                        const sisbas = tree.ScriptInfo.ScaledBorderAndShadow;
+                        const sbas = /Yes/i.test(sisbas as string) ? options.scale : 1;
                         const bsFrom = createCSSBS(tags, sbas);
                         const bsTo = createCSSBS(ttags, sbas);
 
@@ -256,20 +264,22 @@ export function createAnimation() {
             }
 
             kfStr = kf.toString();
-            let name = getName(kfStr, kfObj);
-            if (name === null) {
-                name = "ASS-" + generateUUID();
-                kfObj[name] = kfStr;
+            let animation_name = getName(kfStr, kfObj);
+            if (animation_name === null) {
+                animation_name = "ASS-" + generateUUID();
+                kfObj[animation_name] = kfStr;
             }
-            pt.content[j].animationName = name;
+            pt.content[j].animationName = animation_name;
 
         }
     }
 
     const cssText = [];
     for (const name in kfObj) {
-        cssText.push("@keyframes " + name + kfObj[name]);
-        cssText.push("@-webkit-keyframes " + name + kfObj[name]);
+        if (kfObj.hasOwnProperty(name)) {
+            cssText.push(`@keyframes ${name}${kfObj[name]}`);
+            cssText.push(`@-webkit-keyframes ${name}${kfObj[name]}`);
+        }
     }
     $animation.innerHTML = cssText.join("");
 }

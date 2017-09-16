@@ -1,8 +1,7 @@
-
-
 import {channel} from "../global";
+import {IDialogueToRender} from "./renderer";
 
-export function getChannel(dia) {
+export function getChannel(this:void, dia:IDialogueToRender) {
   const L = dia.Layer;
   const SW = this.width - Math.floor(this.scale * (dia.MarginL + dia.MarginR));
   const SH = this.height;
@@ -21,7 +20,7 @@ export function getChannel(dia) {
     rightEnd: new Uint32Array(SH + 1),
   };
   const align = ["right", "left", "center"][dia.Alignment % 3];
-  const willCollide = function (x) {
+  const willCollide = function (x:number) {
       const l = channel[L].left[x];
       const c = channel[L].center[x];
       const r = channel[L].right[x];
@@ -52,7 +51,7 @@ export function getChannel(dia) {
       }
       return false;
   };
-  const found = function (x) {
+  const found = function (x:number) {
     if (willCollide(x)) {
         count = 0;
     } else {

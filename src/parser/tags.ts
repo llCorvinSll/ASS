@@ -1,29 +1,27 @@
 import {DrawingCommand, parseDrawing} from "./drawing";
-import {IDialogue, IEffect, IStylesMap} from "./ISubtitleTree";
+import {IDialogue, IEffect, IPosition, IStylesMap} from "./ISubtitleTree";
 
 export interface IParsedText {
     content:ITextContent[];
-    clip:string;
+    clip:IClip;
     alignment:number;
     pos:IPosition;
     org:IPosition;
     move:number[];
     fad:number[];
     fade:number[];
-}
-
-interface IPosition {
-    x:number;
-    y:number;
+    animationName?:string;
 }
 
 export interface ITextContent {
     text:string;
-    tags:{};
+    animationName?:string;
+    commands?:DrawingCommand[];
+    tags:ITags;
 }
 
-interface ITags {
-    clip:string;
+export interface ITags {
+    clip:IClip;
     b:number;
     i:number;
     u:number;
@@ -37,14 +35,51 @@ interface ITags {
     q:number;
     p:number;
     pbo:number;
+    fs:number;
+    fsp:number;
+    fscx:number;
+    fscy:number;
+    fax:number;
+    fay:number;
+    frx:number;
+    fry:number;
+    frz:number;
+    blur:number;
+    xbord:number;
+    xshad:number;
+    ybord:number;
+    yshad:number;
+    a1:string;
+    c1:string;
+    a3:string;
+    c3:string;
+    a4:string;
+    c4:string;
     t:ITct[];
+
+    [key:string]:string|number|IClip|ITct[];
 }
 
-interface ITct {
+export interface IClip {
+    inverse:boolean;
+    scale:number;
+    commands:DrawingCommand[];
+    dots:number[];
+}
+
+interface IWithTags {
+    tags:ITags;
+}
+
+interface ITct extends IWithTags {
     t1:number;
     t2:number;
     accel:number;
-    tags:{};
+}
+
+interface ICt extends IWithTags {
+    text:string;
+    commands?:DrawingCommand[];
 }
 
 export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
@@ -60,11 +95,7 @@ export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
     });
   }
     for (let i = 1; i < kv.length; i += 2) {
-        const ct:{
-            text:string,
-            tags:ITags,
-            commands?:DrawingCommand[]
-        } = {
+        const ct:ICt = {
             text: kv[i + 1],
             tags: JSON.parse(JSON.stringify(prevTags))
         };
@@ -85,7 +116,7 @@ export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
 
         for (let j = 0; j < cmds.length; ++j) {
             const cmd = cmds[j];
-            parseAnimatableTags.call(ct, cmd);
+            parseAnimatableTags(ct, cmd);
             if (ct.tags.clip) {
                 dia.clip = ct.tags.clip;
             }
@@ -206,10 +237,10 @@ export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
                     t1: 0,
                     t2: (dialogue.End - dialogue.Start) * 1000,
                     accel: 1,
-                    tags: {}
+                    tags: {} as ITags
                 };
                 for (let k = tcmds.length - 1; k >= 0; k--) {
-                    parseAnimatableTags.call(tct, tcmds[k]);
+                    parseAnimatableTags(tct, tcmds[k]);
                 }
                 if (args.length === 2) {
                     tct.accel = parseInt(args[0], 10);
@@ -259,70 +290,70 @@ export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
 }
 
 
-function parseAnimatableTags(cmd:string) {
+function parseAnimatableTags(ct:IWithTags, cmd:string) {
     if (/^fs[\d+\-]/.test(cmd)) {
         const val = cmd.match(/^fs(.*)/)[1];
         if (/^\d/.test(val)) {
-            this.tags.fs = parseInt(val, 10);
+            ct.tags.fs = parseInt(val, 10);
         }
 
         if (/^\+|-/.test(val)) {
-            this.tags.fs *= (parseInt(val, 10) > -10 ? (1 + parseInt(val, 10) / 10) : 1);
+            ct.tags.fs *= (parseInt(val, 10) > -10 ? (1 + parseInt(val, 10) / 10) : 1);
         }
     }
     if (/^fsp/.test(cmd)) {
-        this.tags.fsp = parseInt(cmd.match(/^fsp(.*)/)[1], 10);
+        ct.tags.fsp = parseInt(cmd.match(/^fsp(.*)/)[1], 10);
     }
     if (/^fscx/.test(cmd)) {
-        this.tags.fscx = parseInt(cmd.match(/^fscx(.*)/)[1], 10);
+        ct.tags.fscx = parseInt(cmd.match(/^fscx(.*)/)[1], 10);
     }
     if (/^fscy/.test(cmd)) {
-        this.tags.fscy = parseInt(cmd.match(/^fscy(.*)/)[1], 10);
+        ct.tags.fscy = parseInt(cmd.match(/^fscy(.*)/)[1], 10);
     }
     if (/^fsp/.test(cmd)) {
-        this.tags.fsp = parseInt(cmd.match(/^fsp(.*)/)[1], 10);
+        ct.tags.fsp = parseInt(cmd.match(/^fsp(.*)/)[1], 10);
     }
     if (/^frx/.test(cmd)) {
-        this.tags.frx = parseInt(cmd.match(/^frx(.*)/)[1], 10);
+        ct.tags.frx = parseInt(cmd.match(/^frx(.*)/)[1], 10);
     }
     if (/^fry/.test(cmd)) {
-        this.tags.fry = parseInt(cmd.match(/^fry(.*)/)[1], 10);
+        ct.tags.fry = parseInt(cmd.match(/^fry(.*)/)[1], 10);
     }
     if (/^fr[z\d\-]/.test(cmd)) {
-        this.tags.frz = parseInt(cmd.match(/^frz?(.*)/)[1], 10);
+        ct.tags.frz = parseInt(cmd.match(/^frz?(.*)/)[1], 10);
     }
     if (/^blur\d/.test(cmd)) {
-        this.tags.blur = parseInt(cmd.match(/^blur(.*)/)[1], 10);
+        ct.tags.blur = parseInt(cmd.match(/^blur(.*)/)[1], 10);
     }
     if (/^be\d/.test(cmd)) {
-        this.tags.blur = parseInt(cmd.match(/^be(.*)/)[1], 10);
+        ct.tags.blur = parseInt(cmd.match(/^be(.*)/)[1], 10);
     }
-    if (this.tags.blur < 0) {
-        this.tags.blur = 0;
+    if (ct.tags.blur < 0) {
+        ct.tags.blur = 0;
     }
     if (/^fax/.test(cmd)) {
-        this.tags.fax = parseInt(cmd.match(/^fax(.*)/)[1], 10);
+        ct.tags.fax = parseInt(cmd.match(/^fax(.*)/)[1], 10);
     }
     if (/^fay/.test(cmd)) {
-        this.tags.fay = parseInt(cmd.match(/^fay(.*)/)[1], 10);
+        ct.tags.fay = parseInt(cmd.match(/^fay(.*)/)[1], 10);
     }
     if (/^x*bord/.test(cmd)) {
-        this.tags.xbord = parseInt(cmd.match(/^x*bord(.*)/)[1], 10);
+        ct.tags.xbord = parseInt(cmd.match(/^x*bord(.*)/)[1], 10);
     }
     if (/^y*bord/.test(cmd)) {
-        this.tags.ybord = parseInt(cmd.match(/^y*bord(.*)/)[1], 10);
+        ct.tags.ybord = parseInt(cmd.match(/^y*bord(.*)/)[1], 10);
     }
-    if (this.tags.xbord < 0) {
-        this.tags.xbord = 0;
+    if (ct.tags.xbord < 0) {
+        ct.tags.xbord = 0;
     }
-    if (this.tags.ybord < 0) {
-        this.tags.ybord = 0;
+    if (ct.tags.ybord < 0) {
+        ct.tags.ybord = 0;
     }
     if (/^x*shad/.test(cmd)) {
-        this.tags.xshad = parseInt(cmd.match(/^x*shad(.*)/)[1], 10);
+        ct.tags.xshad = parseInt(cmd.match(/^x*shad(.*)/)[1], 10);
     }
     if (/^y*shad/.test(cmd)) {
-        this.tags.yshad = parseInt(cmd.match(/^y*shad(.*)/)[1], 10);
+        ct.tags.yshad = parseInt(cmd.match(/^y*shad(.*)/)[1], 10);
     }
     if (/^\d?c&?H?[0-9a-f]+/i.test(cmd)) {
         const args = cmd.match(/^(\d?)c&?H?(\w+)/);
@@ -332,21 +363,21 @@ function parseAnimatableTags(cmd:string) {
         while (args[2].length < 6) {
             args[2] = "0" + args[2];
         }
-        this.tags["c" + args[1]] = args[2];
+        ct.tags["c" + args[1]] = args[2];
     }
     if (/^\da&?H?[0-9a-f]+/i.test(cmd)) {
         const args = cmd.match(/^(\d)a&?H?(\w\w)/);
-        this.tags["a" + args[1]] = args[2];
+        ct.tags[`a${args[1]}`] = args[2];
     }
     if (/^alpha&?H?[0-9a-f]+/i.test(cmd)) {
         for (let i = 1; i <= 4; i++) {
-            this.tags["a" + i] = cmd.match(/^alpha&?H?(\w\w)/)[1];
+            ct.tags[`a${i}`] = cmd.match(/^alpha&?H?(\w\w)/)[1];
     }
   }
     if (/^i?clip/.test(cmd)) {
         const p = cmd.match(/^i?clip\s*\((.*)\)/)[1].split(/\s*,\s*/);
 
-        this.tags.clip = {
+        ct.tags.clip = {
             inverse: /iclip/.test(cmd),
             scale: 1,
             commands: null,
@@ -354,16 +385,16 @@ function parseAnimatableTags(cmd:string) {
         };
 
         if (p.length === 1) {
-            this.tags.clip.commands = parseDrawing(p[0]);
+            ct.tags.clip.commands = parseDrawing(p[0]);
         }
 
         if (p.length === 2) {
-            this.tags.clip.scale = parseInt(p[0], 10);
-            this.tags.clip.commands = parseDrawing(p[1]);
+            ct.tags.clip.scale = parseInt(p[0], 10);
+            ct.tags.clip.commands = parseDrawing(p[1]);
         }
 
         if (p.length === 4) {
-            this.tags.clip.dots = [parseInt(p[0], 10), parseInt(p[1], 10), parseInt(p[2], 10), parseInt(p[3], 10)];
+            ct.tags.clip.dots = [parseInt(p[0], 10), parseInt(p[1], 10), parseInt(p[2], 10), parseInt(p[3], 10)];
         }
     }
 }
