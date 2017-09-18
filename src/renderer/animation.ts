@@ -23,15 +23,19 @@ class KeyFrames {
     public toString() {
         const arr = ["{"];
         for (const percentage in this.obj) {
-            arr.push(percentage + "{");
-            for (const property in this.obj[percentage]) {
-                const rule = `${property}:${this.obj[percentage][property]};`;
-                if (property === "transform") {
-                    arr.push(`-webkit-${rule}`);
+            if (this.obj.hasOwnProperty(percentage)) {
+                arr.push(percentage + "{");
+                for (const property in this.obj[percentage]) {
+                    if (this.obj[percentage].hasOwnProperty(property)) {
+                        const rule = `${property}:${this.obj[percentage][property]};`;
+                        if (property === "transform") {
+                            arr.push(`-webkit-${rule}`);
+                        }
+                        arr.push(rule);
+                    }
                 }
-                arr.push(rule);
+                arr.push("}");
             }
-            arr.push("}");
         }
         arr.push("}\n");
         return arr.join("");
@@ -112,6 +116,7 @@ export function createAnimation(this:void, tree:ISubtitleTree, options:IAnimatio
                 t[j] = Math.min(100, pt.fade[j + 2] / dur * 100).toFixed(3) + "%";
             }
             for (let j = 0; j <= 5; j++) {
+                /* tslint:disable-next-line:no-bitwise */
                 kf.set(t[j], "opacity", 1 - pt.fade[j >> 1] / 255);
             }
         }

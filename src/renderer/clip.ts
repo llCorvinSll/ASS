@@ -4,9 +4,9 @@ import {getDrawingAttributes} from "./drawing";
 import {IDialogueToRender} from "./renderer";
 import {ISubtitleTree} from "../parser/ISubtitleTree";
 
-const $clipPath = document.createElementNS(xmlns, "svg");
+export const $clipPath = document.createElementNS(xmlns, "svg");
 $clipPath.setAttributeNS(null, "class", "ASS-clip-path");
-const $clipPathDefs = document.createElementNS(xmlns, "defs");
+export const $clipPathDefs = document.createElementNS(xmlns, "defs");
 $clipPath.appendChild($clipPathDefs);
 
 interface ICreateClipPathOptions {
@@ -17,12 +17,14 @@ export function createClipPath(this:void, dia:IDialogueToRender, options:ICreate
     if (dia.clip) {
         let d = "";
         const id = "ASS-" + generateUUID();
+        /* tslint:disable-next-line:no-bitwise */
         const s = 1 / (1 << (dia.clip.scale - 1));
         const prx = options.tree.ScriptInfo.PlayResX;
         const pry = options.tree.ScriptInfo.PlayResY;
 
         if (dia.clip.dots !== null) {
             const n = dia.clip.dots.map((dot, i) => {
+                /* tslint:disable-next-line:no-bitwise */
                 if (i & 1) {
                     return dot / pry;
                 } else {

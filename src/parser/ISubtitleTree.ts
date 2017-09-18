@@ -43,6 +43,11 @@ export const enum BlockType {
 
 export interface IStyle {
     Name:string;
+    Alignment:number;
+    BorderStyle:number;
+    MarginL:number;
+    MarginR:number;
+    MarginV:number;
     Fontname:string;
     Fontsize:string;
     PrimaryColour:string;

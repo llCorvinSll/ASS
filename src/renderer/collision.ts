@@ -1,15 +1,23 @@
 import {channel} from "../global";
 import {IDialogueToRender} from "./renderer";
 
-export function getChannel(this:void, dia:IDialogueToRender) {
+
+interface IGetChannelOptions {
+    width:number;
+    height:number;
+    scale:number;
+    video:HTMLVideoElement;
+}
+
+export function getChannel(this:void, dia:IDialogueToRender, options:IGetChannelOptions) {
   const L = dia.Layer;
-  const SW = this.width - Math.floor(this.scale * (dia.MarginL + dia.MarginR));
-  const SH = this.height;
+  const SW = options.width - Math.floor(options.scale * (dia.MarginL + dia.MarginR));
+  const SH = options.height;
   const W = dia.width;
   const H = dia.height;
-  const V = Math.floor(this.scale * dia.MarginV);
-  const  vct = this.video.currentTime;
-  const count = 0;
+  const V = Math.floor(options.scale * dia.MarginV);
+  const  vct = options.video.currentTime;
+  let count = 0;
 
   channel[L] = channel[L] || {
     left: new Uint16Array(SH + 1),
@@ -77,6 +85,7 @@ export function getChannel(this:void, dia:IDialogueToRender) {
         }
     }
   } else {
+      /* tslint:disable-next-line:no-bitwise */
       for (let i = (SH - H) >> 1; i < SH - V; i++) {
           if (found(i)) {
               break;

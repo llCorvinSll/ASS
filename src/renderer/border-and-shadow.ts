@@ -33,7 +33,7 @@ export function createSVGBS(t:ITags, id:string, s:number):SVGFilterElement {
     dil.setAttributeNS(null, "result", "dil");
     filter.appendChild(dil);
     const dil_b = document.createElementNS(xmlns, "feGaussianBlur");
-    dil_b.setAttributeNS(null, "stdDeviation", blur);
+    dil_b.setAttributeNS(null, "stdDeviation", `${blur}`);
     dil_b.setAttributeNS(null, "in", "dil");
     dil_b.setAttributeNS(null, "result", "dil_b");
     filter.appendChild(dil_b);

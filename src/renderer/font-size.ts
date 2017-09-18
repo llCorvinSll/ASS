@@ -5,7 +5,7 @@ interface IFontSizeCache {
 const FONT_SIZE_CACHE:IFontSizeCache = {};
 
 
-const $ffs = document.createElement("div");
+export const $ffs:HTMLDivElement = document.createElement("div");
 $ffs.className = "ASS-fix-font-size";
 $ffs.textContent = "M";
 

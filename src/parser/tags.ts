@@ -197,8 +197,8 @@ export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
                         return parseInt(x, 10);
                     });
                 dia.pos = {
-                    x: p[0] * 1,
-                    y: p[1] * 1
+                    x: p[0],
+                    y: p[1]
                 };
                 if (p.length === 4) {
                     p.push(0);
@@ -260,19 +260,23 @@ export function parseTags(dialogue:IDialogue, styles:IStylesMap):IParsedText {
                 ct.tags.t.push(tct);
             }
         }
+
         if (ct.tags.t) {
             for (let j = 0; j < ct.tags.t.length - 1; ++j) {
                 for (let k = j + 1; k < ct.tags.t.length; ++k) {
                     if (ct.tags.t[j].t1 === ct.tags.t[k].t1 &&
                         ct.tags.t[j].t2 === ct.tags.t[k].t2) {
                         for (const l in ct.tags.t[k].tags) {
-                            ct.tags.t[j].tags[l] = ct.tags.t[k].tags[l];
+                            if ((ct.tags.t[k].tags as any).hasOwnProperty(l)) {
+                                ct.tags.t[j].tags[l] = ct.tags.t[k].tags[l];
+                            }
                         }
                         ct.tags.t.splice(k, 1);
-          }
+                    }
+                }
+            }
         }
-      }
-    }
+
         if (dialogue.Effect && (dialogue.Effect as IEffect).name === "banner") {
             ct.tags.q = 2;
         }

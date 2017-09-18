@@ -13,37 +13,10 @@
     "importHelpers": true,
     "noEmitHelpers": true,
     "allowSyntheticDefaultImports": true,
-    "moduleResolution": "node",
-    "typeRoots": [
-      "node_modules/@types",
-      "es6_module_adapters/@types",
-      "services/_definitions"
-    ],
-    "types": [
-      "jasmine",
-      "jquery",
-      "jquery-mockjax",
-      "react",
-      "react-dom",
-      "lodash",
-      "underscore",
-      "urijs"
-    ]
+    "moduleResolution": "node"
   },
   "exclude": [
-    "node_modules",
-    "tools",
-    "i18n",
-    "tests_selenium",
-    "vision/samsung_builder",
-    "vast_parser"
+    "node_modules"
   ],
-  "baseUrl": ".",
-  "paths": {
-    "md5": ["es6_module_adapters/md5/index"],
-    "webos": ["es6_module_adapters/webos/index"],
-    "cordova_webos": ["es6_module_adapters/cordova_webos/index"],
-    "route-parser": ["es6_module_adapters/route-parser/index"],
-    "log4ts": ["es6_module_adapters/log4ts/index"]
-  }
+  "baseUrl": "."
 }

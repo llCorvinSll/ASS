@@ -2,20 +2,27 @@ import {generateUUID} from "../uuid";
 import {xmlns} from "../global";
 import {createSVGBS} from "./border-and-shadow";
 import {ITextContent} from "../parser/tags";
-import {IDialogueToRender} from "./renderer";
 import {DrawingCommand} from "../parser/drawing";
+import {ISubtitleTree} from "../parser/ISubtitleTree";
 
-export function createDrawing(this:void, cn:HTMLSpanElement, ct:ITextContent, dia:IDialogueToRender) {
+
+interface ICreateDrawingOptions {
+    scale:number;
+    tree:ISubtitleTree;
+}
+
+export function createDrawing(this:void, cn:HTMLSpanElement, ct:ITextContent, options:ICreateDrawingOptions) {
     const t = ct.tags;
-    const s = this.scale / (1 << (t.p - 1));
+    /* tslint:disable-next-line:no-bitwise */
+    const s = options.scale / (1 << (t.p - 1));
     const sx = (t.fscx ? t.fscx / 100 : 1) * s;
     const sy = (t.fscy ? t.fscy / 100 : 1) * s;
     const gda = getDrawingAttributes(ct.commands);
     const vb = [gda.minX, gda.minY, gda.width, gda.height].join(" ");
     const filterID = "ASS-" + generateUUID();
     const symbolID = "ASS-" + generateUUID();
-    const sisbas = this.tree.ScriptInfo.ScaledBorderAndShadow;
-    const sbas = /Yes/i.test(sisbas) ? this.scale : 1;
+    const sisbas = options.tree.ScriptInfo.ScaledBorderAndShadow;
+    const sbas = /Yes/i.test(sisbas) ? options.scale : 1;
     const xlink = "http://www.w3.org/1999/xlink";
     const blur = t.blur || 0;
     const vbx = t.xbord + (t.xshad < 0 ? -t.xshad : 0) + blur;
