@@ -14,14 +14,8 @@ interface IClipElement {
     cssText:string;
 }
 
-interface IDialogueNode {
-    className?:string;
-}
-
-
 export interface IDialogueToRender {
     Alignment:number;
-    nodeElement:IDialogueNode; // HTMLDivElement;
     node:HTMLDivElement;
     clipElement?:IClipElement;
     Layer:number;
@@ -65,7 +59,6 @@ export function renderer(this:void, dialogue:IDialogue, options:IRenderOptions):
     const pt = dialogue._parsedText;
     const s = options.tree.V4Styles.Style[dialogue.Style];
     const dia:IDialogueToRender = {
-        nodeElement: {}, // document.createElement("div"),
         node: document.createElement("div"),
         Alignment: pt.alignment || s.Alignment,
         Layer: dialogue.Layer,
@@ -87,7 +80,7 @@ export function renderer(this:void, dialogue:IDialogue, options:IRenderOptions):
         channel: 0,
         t: false,
     };
-    dia.nodeElement.className = "ASS-dialogue";
+    dia.node.className = "ASS-dialogue";
 
     setTagsStyle(dia, {
         currentTime: options.currentTime,
