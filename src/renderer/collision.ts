@@ -6,7 +6,8 @@ interface IGetChannelOptions {
     width:number;
     height:number;
     scale:number;
-    video:HTMLVideoElement;
+    currentTime:number;
+    // video:HTMLVideoElement;
 }
 
 export function getChannel(this:void, dia:IDialogueToRender, options:IGetChannelOptions) {
@@ -16,7 +17,7 @@ export function getChannel(this:void, dia:IDialogueToRender, options:IGetChannel
   const W = dia.width;
   const H = dia.height;
   const V = Math.floor(options.scale * dia.MarginV);
-  const  vct = options.video.currentTime;
+  const  vct = options.currentTime;
   let count = 0;
 
   channel[L] = channel[L] || {

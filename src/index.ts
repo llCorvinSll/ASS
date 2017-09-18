@@ -209,8 +209,7 @@ export default class ASSParser {
                     scale: this.scale,
                     currentTime: this.video.currentTime,
                     width: this.width,
-                    height: this.height,
-                    video: this.video
+                    height: this.height
                 });
 
                 this.stage.appendChild(dia.node);

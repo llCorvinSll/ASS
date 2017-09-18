@@ -55,12 +55,10 @@ export interface IDialogueToRender {
 
 interface IRenderOptions {
     tree:ISubtitleTree;
-    video:HTMLVideoElement;
     scale:number;
     width:number;
     height:number;
     currentTime:number;
-    // stage:HTMLDivElement;
 }
 
 export function renderer(this:void, dialogue:IDialogue, options:IRenderOptions):IDialogueToRender {
@@ -105,11 +103,11 @@ export function renderer(this:void, dialogue:IDialogue, options:IRenderOptions):
         scale: options.scale,
         width: options.width,
         height: options.height,
-        video: options.video
+        currentTime: options.currentTime
     });
     setDialogueStyle(dia, {
         width: options.width,
-        video: options.video,
+        currentTime: options.currentTime,
         scale: options.scale
     });
     setTransformOrigin(dia);
@@ -245,7 +243,8 @@ interface ISetDialoguePosition {
     height:number;
     width:number;
     scale:number;
-    video:HTMLVideoElement;
+    currentTime:number;
+    // video:HTMLVideoElement;
 }
 
 function setDialoguePosition(this:void, dia:IDialogueToRender, options:ISetDialoguePosition) {
@@ -324,7 +323,7 @@ function setDialoguePosition(this:void, dia:IDialogueToRender, options:ISetDialo
                     width: options.width,
                     height: options.height,
                     scale: options.scale,
-                    video: options.video
+                    currentTime: options.currentTime
                 });
             }
         }
@@ -333,14 +332,15 @@ function setDialoguePosition(this:void, dia:IDialogueToRender, options:ISetDialo
 
 
 interface ISetDialogueStyle {
-    video:HTMLVideoElement;
+    // video:HTMLVideoElement;
+    currentTime:number;
     width:number;
     scale:number;
 }
 
 function setDialogueStyle(this:void, dia:IDialogueToRender, options:ISetDialogueStyle) {
     const cssText:string[] = [];
-    const vct = options.video.currentTime;
+    const vct = options.currentTime;
     if (dia.Layer) {
         cssText.push("z-index:" + dia.Layer);
     }
